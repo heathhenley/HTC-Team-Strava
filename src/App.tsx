@@ -53,7 +53,7 @@ function App() {
           </Button>
         </Unauthenticated>
       </header>
-      <section className="w-full h-full flex flex-col py-8">
+      <section className="w-full h-full flex flex-col py-8 px-4">
         <Authenticated>
           <div className="flex flex-col gap-16">
             <TeamProgress
