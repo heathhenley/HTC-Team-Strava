@@ -9,8 +9,8 @@ import { v } from "convex/values";
 
 const ACTIVITIES_URL = "https://www.strava.com/api/v3/athlete/activities";
 
-// get the timestamp for October 1st 2024, convert to seconds and
-const HTC_START = new Date("2024-10-01").getTime() / 1000;
+// get the timestamp for October 15st 2024, convert to seconds
+const HTC_START = new Date("2024-10-15").getTime() / 1000;
 
 // Get the users activities from the strava api
 async function getActivities(accessToken: string) {
