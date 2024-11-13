@@ -22,14 +22,15 @@ function App() {
   const allStats = useQuery(api.strava.stats.getAllStats);
 
   return (
-    <div className="flex flex-col h-[100vh] p-6 w-full">
-      <header className="flex justify-between w-full">
+    <div className="flex flex-col h-[100vh] py-2 w-full">
+      <header className="flex justify-between w-full border-b-2 p-4">
         <div>
           <h1 className="text-2xl">
-            Long Distance <span className="text-gray-800 font-semibold">Relay</span>tionship
+            Long Distance{" "}
+            <span className="text-gray-800 font-semibold">Relay</span>tionship
           </h1>
           <span className="py-2 text-sm">
-            <p>Aggregated stats for the HTC 2025 team (and friends)</p>
+            <p>Aggregated stats for the HTC 2025 team (and alumns, subs, friends, etc.)</p>
           </span>
         </div>
         <Authenticated>
@@ -43,6 +44,7 @@ function App() {
         </Authenticated>
         <Unauthenticated>
           <Button
+            className="bg-orange-500"
             onClick={() => {
               signIn("strava");
             }}
@@ -89,7 +91,22 @@ function App() {
           </div>
         </Authenticated>
         <Unauthenticated>
-          <p>Sign in with strave to view the teams stats</p>
+          <div className="w-full h-3/4 flex flex-col justify-center items-center gap-2 text-center">
+            <div>
+              <div className="text-2xl">Stats for the HTC 2025 team</div>
+              <div className="text-sm">
+                Sign in with Strava and approve read access to your public
+                activites.
+              </div>
+            </div>
+            <Button
+              className="bg-orange-500"
+              variant="default"
+              onClick={() => signIn("strava")}
+            >
+              Sign In
+            </Button>
+          </div>
         </Unauthenticated>
       </section>
       <footer className="w-full flex-col justify-center items-center text-center">

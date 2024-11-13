@@ -4,6 +4,7 @@ import { authTables } from "@convex-dev/auth/server";
  
 const schema = defineSchema({
   ...authTables,
+
   users: defineTable({
     name: v.optional(v.string()),
     id: v.optional(v.string()),
@@ -17,6 +18,7 @@ const schema = defineSchema({
     expiresAt: v.optional(v.number()),
     statsGatheredAt: v.optional(v.number()),
   }).index("id", ["id"]),
+
   stats: defineTable({
     totalDistance: v.optional(v.number()),
     totalElevation: v.optional(v.number()),
@@ -24,6 +26,7 @@ const schema = defineSchema({
     totalActivities: v.optional(v.number()),
     userId: v.id("users"),
   }).index("userId", ["userId"]),
+
   activities: defineTable({
     id: v.optional(v.number()),
     distance: v.optional(v.number()),
