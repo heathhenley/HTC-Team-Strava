@@ -7,14 +7,34 @@ import {
 import { internal } from "../_generated/api";
 import { v } from "convex/values";
 
-const ACTIVITIES_URL = "https://www.strava.com/api/v3/athlete/activities";
-
-// get the timestamp for October 15st 2024, convert to seconds
+// get the timestamp for October 15st 2024
 const HTC_START = new Date("2024-10-15").getTime() / 1000;
+const ACTIVITIES_URL = "https://www.strava.com/api/v3/athlete/activities";
+const metersToMiles = 0.000621371;
+const metersToFeet = 3.28084;
+const secondsToHours = 1 / 3600;
+
+type UserTotals = {
+  totalDistance: number;
+  totalElevation: number;
+  totalMovingTime: number;
+  totalActivities: number;
+  user: {
+    userName: string;
+    stravaId: string;
+  };
+};
 
 // Get the users activities from the strava api
-async function getActivities(accessToken: string) {
-  const url = `${ACTIVITIES_URL}?after=${HTC_START}`;
+async function getActivities({
+  accessToken,
+  statsGatheredAt,
+}: {
+  accessToken: string;
+  statsGatheredAt?: number;
+}): Promise<UserTotals[]> {
+  const after = statsGatheredAt ? statsGatheredAt / 1000 : HTC_START;
+  const url = `${ACTIVITIES_URL}?after=${after}`;
   const response = await fetch(url, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -22,14 +42,10 @@ async function getActivities(accessToken: string) {
     },
   });
   if (!response.ok) {
-    return { error: "Failed to get activities" };
+    throw new Error("Failed to get activities");
   }
   return response.json();
 }
-
-const metersToMiles = 0.000621371;
-const metersToFeet = 3.28084;
-const secondsToHours = 1 / 3600;
 
 export const getAllStats = query({
   args: {},
@@ -42,13 +58,22 @@ export const getAllStats = query({
     // get the users
     const allUsers = ctx.db.query("users").collect();
 
+    // get the users associated account ids (to make a link)
+    const accountIds = await ctx.db.query("authAccounts").collect();
+
     const [stats, users] = await Promise.all([allStats, allUsers]);
 
     // join the stats and users
     const statsWithUsers = stats.map((stat) => {
       const user = users.find((u) => u._id === stat.userId);
+      const stravaId = accountIds.find(
+        (a) => a.userId === stat.userId
+      )?.providerAccountId;
       return {
-        username: user?.userName ?? "Unknown",
+        user: {
+          stravaId: stravaId,
+          username: user?.userName ?? "Unknown",
+        },
         totalDistance: (stat.totalDistance ?? 0) * metersToMiles,
         totalElevation: (stat.totalElevation ?? 0) * metersToFeet,
         totalMovingTime: (stat.totalMovingTime ?? 0) * secondsToHours,
@@ -84,26 +109,24 @@ export const saveUserStats = action({
       throw new Error("User not found");
     }
 
-    if (statsGatheredAt) {
-      return { status: "Stats already gathered!" };
-    }
-
     // if the access token has expired, refresh it
     if (expiresAt < Date.now()) {
       // refresh the access token using the refresh token
       const response = await fetch(
-        "https://www.strava.com/api/v3/oauth/token", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          client_id: Number(process.env.AUTH_STRAVA_ID),
-          client_secret: process.env.AUTH_STRAVA_SECRET,
-          refresh_token: refreshToken,
-          grant_type: "refresh_token",
-        }),
-      });
+        "https://www.strava.com/api/v3/oauth/token",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            client_id: Number(process.env.AUTH_STRAVA_ID),
+            client_secret: process.env.AUTH_STRAVA_SECRET,
+            refresh_token: refreshToken,
+            grant_type: "refresh_token",
+          }),
+        }
+      );
       const data = await response.json();
       if (!data.access_token) {
         throw new Error("Failed to refresh token");
@@ -117,11 +140,11 @@ export const saveUserStats = action({
         accessToken: data.access_token as string,
         expiresAt: data.expires_at as number,
         refreshToken: data.refresh_token as string,
-      })
+      });
     }
 
     // Get the users activities from the strava api
-    const activities = await getActivities(accessToken);
+    const activities = await getActivities({ accessToken, statsGatheredAt });
 
     // use and internal mutation to save new activities
     await ctx.runMutation(internal.strava.stats.saveActivities, {
@@ -132,7 +155,6 @@ export const saveUserStats = action({
     return { status: "Stats gathered!" };
   },
 });
-
 
 export const saveActivities = internalMutation({
   args: { userId: v.id("users"), activities: v.any() },
@@ -150,7 +172,7 @@ export const saveActivities = internalMutation({
       if (!activity.type || !activity.distance || !activity.moving_time) {
         continue;
       }
-      if (!(["Hike", "Walk", "Run"].includes(activity.type))) {
+      if (!["Hike", "Walk", "Run"].includes(activity.type)) {
         continue;
       }
       if (usersActivityIds.includes(activity.id)) {
@@ -176,7 +198,6 @@ export const saveActivities = internalMutation({
         totalMovingTime: activity.moving_time,
         totalActivities: 1,
       });
-
     }
   },
 });
@@ -200,13 +221,11 @@ export const updateStats = internalMutation({
 
     await ctx.db.patch(userId, { statsGatheredAt: Date.now() });
 
-    console.log(stats);
-
     // add to the running stats total if exists, otherwise create a new one
     if (stats) {
       return await ctx.db.patch(stats._id, {
         totalDistance: (stats.totalDistance ?? 0) + totalDistance,
-        totalElevation: (stats.totalElevation ?? 0)+ totalElevation,
+        totalElevation: (stats.totalElevation ?? 0) + totalElevation,
         totalMovingTime: (stats.totalMovingTime ?? 0) + totalMovingTime,
         totalActivities: (stats.totalActivities ?? 0) + totalActivities,
         userId,
