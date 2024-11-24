@@ -1,12 +1,8 @@
-# Stava Stats
-Aggregating and comparing stats for our Hood to Coast team - and
+# Strava Stats
+Aggregating and comparing stats for our 2025 [Hood to Coast](https://hoodtocoast.com/) team - and
 giving me a chance to play with [convex.dev](https://convex.dev).
 
-If you are from strava reading this - please approve my app!
-- we will have no more than 10-15 users (the team)
-- most of us are premium strava users anyway
-- there is no commercial intent
-- we followed all the brand guidelines
+If you are from Strava reading this - thanks for approving our app!
 
 # Running the app
 1. Clone the repo
