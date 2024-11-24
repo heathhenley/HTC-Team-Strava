@@ -114,7 +114,7 @@ function App() {
   return (
     <div className="flex flex-col py-2 w-full h-full">
       <Header />
-      <section className="w-full h-full flex flex-col flex-grow md:py-8 px-4 bg-slate-50">
+      <section className="w-full h-full flex flex-col flex-grow md:py-8 px-4 bg-slate-50 py-4">
         <Authenticated>
           <div className="flex flex-col gap-2">
             <div className="flex flex-col w-full gap-2">
