@@ -98,7 +98,7 @@ async function getActivities({
 
 export const getAllStats = query({
   args: {},
-  handler: async (ctx) : Promise<UserTotals> => {
+  handler: async (ctx) : Promise<UserTotals[]> => {
     // TODO: I don't think there's a way to join
 
     // get the stats
@@ -120,7 +120,7 @@ export const getAllStats = query({
       )?.providerAccountId;
       return {
         user: {
-          stravaId: stravaId,
+          stravaId: stravaId ?? "",
           username: user?.userName ?? "Unknown",
           profilePicture: user?.image ?? "",
         },

@@ -159,8 +159,8 @@ function App() {
                         >
                           <Avatar>
                             <AvatarImage src={stat.user.profilePicture} />
-                            <AvatarFallback>
-                              {stat.user.username[0]}
+                            <AvatarFallback className="text-lg font-bold">
+                              {stat.user.username[0].toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex flex-col">

@@ -4,7 +4,7 @@ export type UserTotals = {
   totalMovingTime: number;
   totalActivities: number;
   user: {
-    userName: string;
+    username: string;
     stravaId: string;
     profilePicture: string;
   };
