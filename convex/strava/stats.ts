@@ -82,9 +82,13 @@ async function getActivities({
   accessToken: string;
   statsGatheredAt?: number;
 }) {
-  const after = statsGatheredAt
+  // this is not efficient, but gives us the chance to get any activities that
+  // for some reason were missed
+  /*const after = statsGatheredAt
     ? new Date(statsGatheredAt).getTime() / 1000
-    : HTC_START / 1000;
+    : HTC_START / 1000; */
+  console.log(statsGatheredAt);
+  const after = HTC_START / 1000;
   const url = `${ACTIVITIES_URL}?after=${after.toFixed(0)}`;
   const response = await fetch(url, {
     headers: {
