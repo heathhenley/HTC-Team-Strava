@@ -1,6 +1,7 @@
 import { useAuthActions } from "@convex-dev/auth/react";
 import { Authenticated, Unauthenticated, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
+import { GithubIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -22,11 +23,10 @@ import {
 import TeamProgress from "./components/team-progress";
 import StravaConnect from "./components/strava-connect";
 import PoweredBy from "./components/powered-by";
-import { GithubIcon } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "./components/ui/avatar";
 import { TeamStatsPerMonth } from "shared/types";
 
 const TEAM_GOAL = 3000; // miles
-
 
 const chartConfig = {
   totalDistance: {
@@ -139,11 +139,10 @@ function App() {
               </TableCaption>
               <TableHeader>
                 <TableRow className="text-xs md:text-sm">
-                  <TableHead>Username</TableHead>
+                  <TableHead></TableHead>
                   <TableHead>Distance (miles)</TableHead>
                   <TableHead>Elevation (ft)</TableHead>
                   <TableHead>Time (hours)</TableHead>
-                  <TableHead>Activities</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -155,16 +154,28 @@ function App() {
                     >
                       <TableCell>
                         <a
-                          className="underline hover:text-blue-500"
+                          className=" hover:text-blue-500 flex gap-3"
                           href={`https://www.strava.com/athletes/${stat.user.stravaId}`}
                         >
-                          {stat.user.username}
+                          <Avatar>
+                            <AvatarImage src={stat.user.profilePicture} />
+                            <AvatarFallback>
+                              {stat.user.username[0]}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex flex-col">
+                            <div className="font-medium">
+                              {stat.user.username}
+                            </div>
+                            <div className="text-gray-500 text-sm">
+                              Activities: {stat.totalActivities}
+                            </div>
+                          </div>
                         </a>
                       </TableCell>
                       <TableCell>{stat.totalDistance.toFixed(2)}</TableCell>
                       <TableCell>{stat.totalElevation.toFixed(0)}</TableCell>
                       <TableCell>{stat.totalMovingTime.toFixed(1)}</TableCell>
-                      <TableCell>{stat.totalActivities}</TableCell>
                     </TableRow>
                   ))}
               </TableBody>

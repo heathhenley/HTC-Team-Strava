@@ -6,6 +6,7 @@ export type UserTotals = {
   user: {
     userName: string;
     stravaId: string;
+    profilePicture: string;
   };
 };
 
