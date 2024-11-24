@@ -37,11 +37,11 @@ type TeamStatsPerMonth = {
 const chartConfig = {
   totalDistance: {
     label: "Miles",
-    color: "#2563eb",
+    color: "#f97316",
   },
   totalActivities: {
     label: "Activities",
-    color: "#60a5fa",
+    color: "#fdba74",
   },
 } satisfies ChartConfig;
 
@@ -55,14 +55,14 @@ export function TeamStatsBarChart({ data }: { data?: TeamStatsPerMonth[] }) {
           content={<ChartTooltipContent className="bg-white/90" />}
         />
         <Bar
-          dataKey="totalDistance"
-          radius={4}
-          fill="var(--color-totalDistance)"
-        />
-        <Bar
           dataKey="totalActivities"
           radius={4}
           fill="var(--color-totalActivities)"
+        />
+        <Bar
+          dataKey="totalDistance"
+          radius={4}
+          fill="var(--color-totalDistance)"
         />
         <XAxis
           dataKey="month"
@@ -116,7 +116,6 @@ function App() {
   const { signIn } = useAuthActions();
   const allStats = useQuery(api.strava.stats.getAllStats);
   const teamStats = useQuery(api.strava.stats.getTeamStatsPerMonth);
-  console.log(teamStats);
 
   return (
     <div className="flex flex-col py-2 w-full h-full">
