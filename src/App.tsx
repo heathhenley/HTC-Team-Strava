@@ -203,7 +203,7 @@ function App() {
           </div>
         </Unauthenticated>
       </section>
-      <footer className="w-full flex px-6 pt-4 justify-between items-center text-center bg-white">
+      <footer className="w-full flex px-6 pt-4 justify-between items-center text-center bg-white border-t-2 ">
         <div>
           <p className="text-xs md:text-base">TarpsOff Industries 2024</p>
           <p className="text-xs md:text-sm text-gray-500">Est. 2022 🏃‍♂️</p>
