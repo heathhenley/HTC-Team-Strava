@@ -34,6 +34,7 @@ const schema = defineSchema({
     movingTime: v.optional(v.number()),
     elevation: v.optional(v.number()),
     type: v.optional(v.string()),
+    sportType: v.optional(v.string()),
     userId: v.id("users"),
     sufferScore: v.optional(v.number()),
     kudosCount: v.optional(v.number()),

@@ -81,8 +81,10 @@ async function getActivities({
   accessToken: string;
   statsGatheredAt?: number;
 }): Promise<UserTotals[]> {
-  const after = statsGatheredAt ? statsGatheredAt / 1000 : HTC_START / 1000;
-  const url = `${ACTIVITIES_URL}?after=${after}`;
+  const after = statsGatheredAt
+    ? new Date(statsGatheredAt).getTime() / 1000
+    : HTC_START / 1000;
+  const url = `${ACTIVITIES_URL}?after=${after.toFixed(0)}`;
   const response = await fetch(url, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -220,9 +222,12 @@ export const saveActivities = internalMutation({
     // create a new activity if it doesn't already exist
     for (const activity of activities) {
       if (!activity.type || !activity.distance || !activity.moving_time) {
+        console.log("Skipping activity", activity);
         continue;
       }
       if (!["Hike", "Walk", "Run"].includes(activity.type)) {
+        console.log("Skipping activity", activity.type);
+        console.log(activity?.sport_type);
         continue;
       }
       if (usersActivityIds.includes(activity.id)) {
@@ -236,6 +241,7 @@ export const saveActivities = internalMutation({
         movingTime: activity.moving_time,
         elevation: activity.total_elevation_gain,
         type: activity.type,
+        sportType: activity.sport_type ?? activity.type ?? "",
         userId,
         sufferScore: activity.suffer_score,
         kudosCount: activity.kudos_count,
