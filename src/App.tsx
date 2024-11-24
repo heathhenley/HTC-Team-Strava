@@ -201,14 +201,14 @@ function App() {
       </section>
       <footer className="w-full flex px-6 justify-between items-center text-center">
         <div>
-          <p>TarpsOff Industries 2024</p>
-          <p className="text-sm text-gray-500">Est. 2022 🏃‍♂️</p>
+          <p className="text-xs md:text-base">TarpsOff Industries 2024</p>
+          <p className="text-xs md:text-sm text-gray-500">Est. 2022 🏃‍♂️</p>
         </div>
         <a href="https://github.com/heathhenley/HTC-Team-Strava">
           {/* switch with new icon */}
           <GithubIcon />
         </a>
-        <div className="w-32">
+        <div className="w-24 md:w-32">
           <PoweredBy />
         </div>
       </footer>
