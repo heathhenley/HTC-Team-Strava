@@ -1,5 +1,6 @@
 import {
   internalMutation,
+  internalQuery,
 } from "../_generated/server";
 import { v } from "convex/values";
 
@@ -17,5 +18,11 @@ export const saveNewToken = internalMutation({
       refreshToken,
       expiresAt,
     });
+  },
+});
+
+export const getAllUsers = internalQuery({
+  handler: async (ctx) => {
+    return ctx.db.query("users").collect();
   },
 });
