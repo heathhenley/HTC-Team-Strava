@@ -3,8 +3,9 @@ import {
   query,
   internalQuery,
   internalMutation,
+  internalAction,
 } from "../_generated/server";
-import { internal } from "../_generated/api";
+import { internal, api } from "../_generated/api";
 import { v } from "convex/values";
 
 import { UserTotals, TeamStatsPerMonth } from "../../shared/types";
@@ -80,7 +81,7 @@ async function getActivities({
 }: {
   accessToken: string;
   statsGatheredAt?: number;
-}): Promise<UserTotals[]> {
+}) {
   const after = statsGatheredAt
     ? new Date(statsGatheredAt).getTime() / 1000
     : HTC_START / 1000;
@@ -140,6 +141,18 @@ export const getUserData = internalQuery({
   args: { userId: v.id("users") },
   handler: async (ctx, { userId }) => {
     return ctx.db.get(userId);
+  },
+});
+
+export const refreshAllStats = internalAction({
+  args: {},
+  handler: async (ctx) => {
+    const users = await ctx.runQuery(internal.strava.users.getAllUsers);
+    for (const user of users) {
+      await ctx.scheduler.runAfter(0, api.strava.stats.saveUserStats, {
+        userId: user._id,
+      });
+    }
   },
 });
 
