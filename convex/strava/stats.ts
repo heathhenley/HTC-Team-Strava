@@ -121,7 +121,7 @@ export const getAllStats = query({
       return {
         user: {
           stravaId: stravaId ?? "",
-          username: user?.userName ?? "Unknown",
+          username: user?.firstName ?? user?.userName ?? "Unknown",
           profilePicture: user?.image ?? "",
         },
         totalDistance: (stat.totalDistance ?? 0) * metersToMiles,
