@@ -167,7 +167,7 @@ function App() {
                             <div className="font-medium">
                               {stat.user.username}
                             </div>
-                            <div className="text-gray-500 text-sm">
+                            <div className="text-gray-500 text-xs">
                               Activities: {stat.totalActivities}
                             </div>
                           </div>
@@ -199,7 +199,7 @@ function App() {
           </div>
         </Unauthenticated>
       </section>
-      <footer className="w-full flex px-6 justify-between items-center text-center">
+      <footer className="w-full flex px-6 pt-4 justify-between items-center text-center">
         <div>
           <p className="text-xs md:text-base">TarpsOff Industries 2024</p>
           <p className="text-xs md:text-sm text-gray-500">Est. 2022 🏃‍♂️</p>
