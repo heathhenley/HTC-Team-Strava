@@ -11,7 +11,6 @@ export const { auth, signIn, signOut, store } = convexAuth({
         },
       },
       profile: (profile, tokens) => {
-        console.log("Strava profile", profile);
         return {
           id: String(profile.id),
           userName: profile.username ?? profile.firstname ?? "Unknown",
