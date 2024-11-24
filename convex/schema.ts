@@ -24,6 +24,7 @@ const schema = defineSchema({
     totalElevation: v.optional(v.number()),
     totalMovingTime: v.optional(v.number()),
     totalActivities: v.optional(v.number()),
+    totalKudos: v.optional(v.number()),
     userId: v.id("users"),
   }).index("userId", ["userId"]),
 

@@ -1,7 +1,7 @@
 import { useAuthActions } from "@convex-dev/auth/react";
 import { Authenticated, Unauthenticated, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
-import { ActivityIcon, GithubIcon } from "lucide-react";
+import { ActivityIcon, GithubIcon, ThumbsUpIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -170,9 +170,15 @@ function App() {
                               <div className="font-medium">
                                 {stat.user.username}
                               </div>
-                              <div className="text-gray-500 text-xs flex items-center">
-                                <ActivityIcon className="w-3" />{" "}
-                                {stat.totalActivities}
+                              <div className="flex gap-2">
+                                <div className="text-gray-500 text-xs flex items-center gap-1">
+                                  <ActivityIcon className="w-3" />
+                                  {stat.totalActivities}
+                                </div>
+                                <div className="text-gray-500 text-xs flex items-center gap-1">
+                                  <ThumbsUpIcon className="w-3" />
+                                  {stat.totalKudos}
+                                </div>
                               </div>
                             </div>
                           </a>

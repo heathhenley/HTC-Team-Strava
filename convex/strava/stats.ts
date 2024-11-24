@@ -16,7 +16,6 @@ const metersToMiles = 0.000621371;
 const metersToFeet = 3.28084;
 const secondsToHours = 1 / 3600;
 
-
 export const getTeamStatsPerMonth = query({
   args: {},
   handler: async (ctx): Promise<TeamStatsPerMonth[]> => {
@@ -67,7 +66,7 @@ export const getTeamStatsPerMonth = query({
         totalMovingTime: monthStats.totalMovingTime * secondsToHours,
         totalActivities: monthStats.totalActivities,
       });
-  
+
       currDate.setMonth(currDate.getMonth() + 1);
     }
     return teamStats;
@@ -98,7 +97,7 @@ async function getActivities({
 
 export const getAllStats = query({
   args: {},
-  handler: async (ctx) : Promise<UserTotals[]> => {
+  handler: async (ctx): Promise<UserTotals[]> => {
     // TODO: I don't think there's a way to join
 
     // get the stats
@@ -128,6 +127,7 @@ export const getAllStats = query({
         totalElevation: (stat.totalElevation ?? 0) * metersToFeet,
         totalMovingTime: (stat.totalMovingTime ?? 0) * secondsToHours,
         totalActivities: stat.totalActivities ?? 0,
+        totalKudos: stat.totalKudos ?? 0,
       };
     });
     return statsWithUsers;
@@ -241,44 +241,55 @@ export const saveActivities = internalMutation({
         kudosCount: activity.kudos_count,
         startDate: new Date(activity.start_date).getTime(),
       });
-      // update the users stats
-      await ctx.runMutation(internal.strava.stats.updateStats, {
-        userId,
-        totalDistance: activity.distance,
-        totalElevation: activity.total_elevation_gain,
-        totalMovingTime: activity.moving_time,
-        totalActivities: 1,
-      });
     }
+    // update the users stats
+    await ctx.runMutation(internal.strava.stats.updateStats, {
+      userId,
+    });
   },
 });
 
 export const updateStats = internalMutation({
   args: {
     userId: v.id("users"),
-    totalDistance: v.number(),
-    totalElevation: v.number(),
-    totalMovingTime: v.number(),
-    totalActivities: v.number(),
   },
-  handler: async (
-    ctx,
-    { userId, totalDistance, totalElevation, totalMovingTime, totalActivities }
-  ) => {
+  handler: async (ctx, { userId }) => {
+    const activities = await ctx.db
+      .query("activities")
+      .filter((q) => q.eq(q.field("userId"), userId))
+      .collect();
+
+    await ctx.db.patch(userId, { statsGatheredAt: Date.now() });
+
+    // calculate the users stats from the activities
+    const totalDistance = activities.reduce((acc, activity) => {
+      return acc + (activity.distance ?? 0);
+    }, 0);
+    const totalElevation = activities.reduce((acc, activity) => {
+      return acc + (activity.elevation ?? 0);
+    }, 0);
+    const totalMovingTime = activities.reduce((acc, activity) => {
+      return acc + (activity.movingTime ?? 0);
+    }, 0);
+    const totalKudos = activities.reduce((acc, activity) => {
+      return acc + (activity.kudosCount ?? 0);
+    }, 0);
+    const totalActivities = activities.length;
+
+    // get the users stats
     const stats = await ctx.db
       .query("stats")
       .filter((q) => q.eq(q.field("userId"), userId))
       .first();
 
-    await ctx.db.patch(userId, { statsGatheredAt: Date.now() });
-
     // add to the running stats total if exists, otherwise create a new one
     if (stats) {
       return await ctx.db.patch(stats._id, {
-        totalDistance: (stats.totalDistance ?? 0) + totalDistance,
-        totalElevation: (stats.totalElevation ?? 0) + totalElevation,
-        totalMovingTime: (stats.totalMovingTime ?? 0) + totalMovingTime,
-        totalActivities: (stats.totalActivities ?? 0) + totalActivities,
+        totalDistance: totalDistance,
+        totalElevation: totalElevation,
+        totalMovingTime: totalMovingTime,
+        totalActivities: totalActivities,
+        totalKudos: totalKudos,
         userId,
       });
     }
@@ -287,6 +298,7 @@ export const updateStats = internalMutation({
       totalElevation,
       totalMovingTime,
       totalActivities,
+      totalKudos,
       userId,
     });
   },
