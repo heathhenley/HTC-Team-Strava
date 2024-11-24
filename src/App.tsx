@@ -12,13 +12,69 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-
+import { BarChart, Bar, XAxis } from "recharts";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "@/components/ui/chart";
 import TeamProgress from "./components/team-progress";
 import StravaConnect from "./components/strava-connect";
 import PoweredBy from "./components/powered-by";
 import { GithubIcon } from "lucide-react";
 
 const TEAM_GOAL = 3000; // miles
+
+type TeamStatsPerMonth = {
+  month: string;
+  totalDistance: number;
+  totalElevation: number;
+  totalMovingTime: number;
+  totalActivities: number;
+};
+
+const chartConfig = {
+  totalDistance: {
+    label: "Miles",
+    color: "#f97316",
+  },
+  totalActivities: {
+    label: "Activities",
+    color: "#fdba74",
+  },
+} satisfies ChartConfig;
+
+export function TeamStatsBarChart({ data }: { data?: TeamStatsPerMonth[] }) {
+  if (!data) return null;
+  return (
+    <ChartContainer config={chartConfig} className="h-5 min-h-[200px] w-full">
+      <BarChart accessibilityLayer data={data}>
+        <ChartTooltip
+          cursor={{ fillOpacity: 0.3 }}
+          content={<ChartTooltipContent className="bg-white/90" />}
+        />
+        <Bar
+          dataKey="totalActivities"
+          radius={4}
+          fill="var(--color-totalActivities)"
+        />
+        <Bar
+          dataKey="totalDistance"
+          radius={4}
+          fill="var(--color-totalDistance)"
+        />
+        <XAxis
+          dataKey="month"
+          tickLine={false}
+          tickMargin={10}
+          axisLine={false}
+          tickFormatter={(value) => value.slice(0, 3)}
+        />
+      </BarChart>
+    </ChartContainer>
+  );
+}
 
 function Header() {
   const { signIn, signOut } = useAuthActions();
@@ -59,21 +115,27 @@ function Header() {
 function App() {
   const { signIn } = useAuthActions();
   const allStats = useQuery(api.strava.stats.getAllStats);
+  const teamStats = useQuery(api.strava.stats.getTeamStatsPerMonth);
 
   return (
-    <div className="flex flex-col h-[100vh] py-2 w-full">
+    <div className="flex flex-col py-2 w-full h-full">
       <Header />
-      <section className="w-full h-full flex flex-col md:py-8 px-4">
+      <section className="w-full h-full flex flex-col flex-grow md:py-8 px-4">
         <Authenticated>
           <div className="flex flex-col gap-2">
-            <TeamProgress
-              actualMiles={
-                allStats?.reduce((acc, stat) => acc + stat.totalDistance, 0) ??
-                0
-              }
-              goalMiles={TEAM_GOAL}
-              title="Total Team Miles"
-            />
+            <div className="flex flex-col w-full">
+              <TeamProgress
+                actualMiles={
+                  allStats?.reduce(
+                    (acc, stat) => acc + stat.totalDistance,
+                    0
+                  ) ?? 0
+                }
+                goalMiles={TEAM_GOAL}
+                title="Total Team Miles"
+              />
+              <TeamStatsBarChart data={teamStats} />
+            </div>
             <div className="text-center text-lg md:text-xl font-bold pt-2">
               The Breakdown
             </div>
@@ -99,6 +161,7 @@ function App() {
                     >
                       <TableCell>
                         <a
+                          className="underline hover:text-blue-500"
                           href={`https://www.strava.com/athletes/${stat.user.stravaId}`}
                         >
                           {stat.user.username}

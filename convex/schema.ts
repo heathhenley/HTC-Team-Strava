@@ -36,6 +36,7 @@ const schema = defineSchema({
     userId: v.id("users"),
     sufferScore: v.optional(v.number()),
     kudosCount: v.optional(v.number()),
+    startDate: v.optional(v.number()),
   }).index("userId", ["userId"]),
 });
  
