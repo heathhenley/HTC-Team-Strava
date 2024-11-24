@@ -23,16 +23,10 @@ import TeamProgress from "./components/team-progress";
 import StravaConnect from "./components/strava-connect";
 import PoweredBy from "./components/powered-by";
 import { GithubIcon } from "lucide-react";
+import { TeamStatsPerMonth } from "shared/types";
 
 const TEAM_GOAL = 3000; // miles
 
-type TeamStatsPerMonth = {
-  month: string;
-  totalDistance: number;
-  totalElevation: number;
-  totalMovingTime: number;
-  totalActivities: number;
-};
 
 const chartConfig = {
   totalDistance: {

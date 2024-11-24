@@ -7,6 +7,8 @@ import {
 import { internal } from "../_generated/api";
 import { v } from "convex/values";
 
+import { UserTotals, TeamStatsPerMonth } from "../../shared/types";
+
 // get the timestamp for October 15st 2024
 const HTC_START = new Date("2024-10-15").getTime();
 const ACTIVITIES_URL = "https://www.strava.com/api/v3/athlete/activities";
@@ -14,24 +16,6 @@ const metersToMiles = 0.000621371;
 const metersToFeet = 3.28084;
 const secondsToHours = 1 / 3600;
 
-type UserTotals = {
-  totalDistance: number;
-  totalElevation: number;
-  totalMovingTime: number;
-  totalActivities: number;
-  user: {
-    userName: string;
-    stravaId: string;
-  };
-};
-
-type TeamStatsPerMonth = {
-  month: string;
-  totalDistance: number;
-  totalElevation: number;
-  totalMovingTime: number;
-  totalActivities: number;
-};
 
 export const getTeamStatsPerMonth = query({
   args: {},
