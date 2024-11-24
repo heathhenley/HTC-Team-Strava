@@ -74,7 +74,7 @@ function Header() {
   const { signIn, signOut } = useAuthActions();
 
   return (
-    <header className="flex justify-between w-full border-b-2 p-4">
+    <header className="flex justify-between w-full border-b-2 p-4 bg-white">
       <div>
         <h1 className="text-lg md:text-2xl">
           Long Distance{" "}
@@ -114,10 +114,10 @@ function App() {
   return (
     <div className="flex flex-col py-2 w-full h-full">
       <Header />
-      <section className="w-full h-full flex flex-col flex-grow md:py-8 px-4">
+      <section className="w-full h-full flex flex-col flex-grow md:py-8 px-4 bg-slate-50">
         <Authenticated>
           <div className="flex flex-col gap-2">
-            <div className="flex flex-col w-full">
+            <div className="flex flex-col w-full gap-2">
               <TeamProgress
                 actualMiles={
                   allStats?.reduce(
@@ -128,58 +128,62 @@ function App() {
                 goalMiles={TEAM_GOAL}
                 title="Total Team Miles"
               />
-              <TeamStatsBarChart data={teamStats} />
+              <div className="shadow-md rounded-lg p-2 bg-white">
+                <TeamStatsBarChart data={teamStats} />
+              </div>
             </div>
-            <div className="text-center text-lg md:text-xl font-bold pt-2">
-              The Breakdown
+            <div className="rounded-lg shadow-md p-2 bg-white">
+              <div className="text-center text-lg md:text-xl font-bold pt-2">
+                The Breakdown
+              </div>
+              <Table>
+                <TableCaption className="text-xs md:text-sm">
+                  Overall Stats for the HTC 2025 Team
+                </TableCaption>
+                <TableHeader>
+                  <TableRow className="text-xs md:text-sm">
+                    <TableHead></TableHead>
+                    <TableHead>Distance (miles)</TableHead>
+                    <TableHead>Elevation (ft)</TableHead>
+                    <TableHead>Time (hours)</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {allStats &&
+                    allStats.map((stat) => (
+                      <TableRow
+                        key={stat.user.username}
+                        className="text-xs md:text-sm"
+                      >
+                        <TableCell>
+                          <a
+                            className=" hover:text-blue-500 flex gap-3"
+                            href={`https://www.strava.com/athletes/${stat.user.stravaId}`}
+                          >
+                            <Avatar>
+                              <AvatarImage src={stat.user.profilePicture} />
+                              <AvatarFallback className="text-lg font-bold">
+                                {stat.user.username[0].toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex flex-col">
+                              <div className="font-medium">
+                                {stat.user.username}
+                              </div>
+                              <div className="text-gray-500 text-xs">
+                                Activities: {stat.totalActivities}
+                              </div>
+                            </div>
+                          </a>
+                        </TableCell>
+                        <TableCell>{stat.totalDistance.toFixed(2)}</TableCell>
+                        <TableCell>{stat.totalElevation.toFixed(0)}</TableCell>
+                        <TableCell>{stat.totalMovingTime.toFixed(1)}</TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
             </div>
-            <Table>
-              <TableCaption className="text-xs md:text-sm">
-                Overall Stats for the HTC 2025 Team
-              </TableCaption>
-              <TableHeader>
-                <TableRow className="text-xs md:text-sm">
-                  <TableHead></TableHead>
-                  <TableHead>Distance (miles)</TableHead>
-                  <TableHead>Elevation (ft)</TableHead>
-                  <TableHead>Time (hours)</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {allStats &&
-                  allStats.map((stat) => (
-                    <TableRow
-                      key={stat.user.username}
-                      className="text-xs md:text-sm"
-                    >
-                      <TableCell>
-                        <a
-                          className=" hover:text-blue-500 flex gap-3"
-                          href={`https://www.strava.com/athletes/${stat.user.stravaId}`}
-                        >
-                          <Avatar>
-                            <AvatarImage src={stat.user.profilePicture} />
-                            <AvatarFallback className="text-lg font-bold">
-                              {stat.user.username[0].toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex flex-col">
-                            <div className="font-medium">
-                              {stat.user.username}
-                            </div>
-                            <div className="text-gray-500 text-xs">
-                              Activities: {stat.totalActivities}
-                            </div>
-                          </div>
-                        </a>
-                      </TableCell>
-                      <TableCell>{stat.totalDistance.toFixed(2)}</TableCell>
-                      <TableCell>{stat.totalElevation.toFixed(0)}</TableCell>
-                      <TableCell>{stat.totalMovingTime.toFixed(1)}</TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
           </div>
         </Authenticated>
         <Unauthenticated>
@@ -199,7 +203,7 @@ function App() {
           </div>
         </Unauthenticated>
       </section>
-      <footer className="w-full flex px-6 pt-4 justify-between items-center text-center">
+      <footer className="w-full flex px-6 pt-4 justify-between items-center text-center bg-white">
         <div>
           <p className="text-xs md:text-base">TarpsOff Industries 2024</p>
           <p className="text-xs md:text-sm text-gray-500">Est. 2022 🏃‍♂️</p>
