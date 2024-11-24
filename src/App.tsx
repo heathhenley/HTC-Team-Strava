@@ -111,6 +111,8 @@ function App() {
   const allStats = useQuery(api.strava.stats.getAllStats);
   const teamStats = useQuery(api.strava.stats.getTeamStatsPerMonth);
 
+  allStats?.sort((a, b) => b.totalDistance - a.totalDistance);
+
   return (
     <div className="flex flex-col py-2 w-full h-full">
       <Header />

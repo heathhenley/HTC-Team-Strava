@@ -27,7 +27,7 @@ export const { auth, signIn, signOut, store } = convexAuth({
   ],
   callbacks: {
     async afterUserCreatedOrUpdated(ctx, { userId }) {
-      ctx.scheduler.runAfter(100, api.strava.stats.saveUserStats, { userId });
+      ctx.scheduler.runAfter(1, api.strava.stats.saveUserStats, { userId });
     },
   },
 });
