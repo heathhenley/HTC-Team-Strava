@@ -8,7 +8,7 @@ import { internal } from "../_generated/api";
 import { v } from "convex/values";
 
 // get the timestamp for October 15st 2024
-const HTC_START = new Date("2024-10-15").getTime() / 1000;
+const HTC_START = new Date("2024-10-15").getTime();
 const ACTIVITIES_URL = "https://www.strava.com/api/v3/athlete/activities";
 const metersToMiles = 0.000621371;
 const metersToFeet = 3.28084;
@@ -25,6 +25,71 @@ type UserTotals = {
   };
 };
 
+type TeamStatsPerMonth = {
+  month: string;
+  totalDistance: number;
+  totalElevation: number;
+  totalMovingTime: number;
+  totalActivities: number;
+};
+
+export const getTeamStatsPerMonth = query({
+  args: {},
+  handler: async (ctx): Promise<TeamStatsPerMonth[]> => {
+    // get the team stats but aggregated by month
+    const startDate = new Date(HTC_START);
+    const currentDate = new Date(Date.now());
+
+    let activites = await ctx.db.query("activities").collect();
+    let teamStats = [];
+
+    let currDate = new Date(startDate);
+    while (
+      currDate.getMonth() <= currentDate.getMonth() ||
+      currDate.getFullYear() !== currentDate.getFullYear()
+    ) {
+      // aggregate the activies for the current month
+      const monthActivities = activites.filter((activity) => {
+        const activityDate = new Date(
+          activity.startDate ?? activity._creationTime
+        );
+        return (
+          activityDate.getMonth() === currDate.getMonth() &&
+          activityDate.getFullYear() === currDate.getFullYear()
+        );
+      });
+
+      const monthStats = monthActivities.reduce(
+        (acc, activity) => {
+          return {
+            totalDistance: acc.totalDistance + (activity.distance ?? 0),
+            totalElevation: acc.totalElevation + (activity.elevation ?? 0),
+            totalMovingTime: acc.totalMovingTime + (activity.movingTime ?? 0),
+            totalActivities: acc.totalActivities + 1,
+          };
+        },
+        {
+          totalDistance: 0,
+          totalElevation: 0,
+          totalMovingTime: 0,
+          totalActivities: 0,
+        }
+      );
+
+      teamStats.push({
+        month: currDate.toLocaleString("default", { month: "long" }),
+        totalDistance: monthStats.totalDistance * metersToMiles,
+        totalElevation: monthStats.totalElevation * metersToFeet,
+        totalMovingTime: monthStats.totalMovingTime * secondsToHours,
+        totalActivities: monthStats.totalActivities,
+      });
+  
+      currDate.setMonth(currDate.getMonth() + 1);
+    }
+    return teamStats;
+  },
+});
+
 // Get the users activities from the strava api
 async function getActivities({
   accessToken,
@@ -33,7 +98,7 @@ async function getActivities({
   accessToken: string;
   statsGatheredAt?: number;
 }): Promise<UserTotals[]> {
-  const after = statsGatheredAt ? statsGatheredAt / 1000 : HTC_START;
+  const after = statsGatheredAt ? statsGatheredAt / 1000 : HTC_START / 1000;
   const url = `${ACTIVITIES_URL}?after=${after}`;
   const response = await fetch(url, {
     headers: {
@@ -189,6 +254,7 @@ export const saveActivities = internalMutation({
         userId,
         sufferScore: activity.suffer_score,
         kudosCount: activity.kudos_count,
+        startDate: new Date(activity.start_date).getTime(),
       });
       // update the users stats
       await ctx.runMutation(internal.strava.stats.updateStats, {

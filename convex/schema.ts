@@ -1,6 +1,7 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 import { authTables } from "@convex-dev/auth/server";
+import { start } from "repl";
  
 const schema = defineSchema({
   ...authTables,
@@ -36,6 +37,7 @@ const schema = defineSchema({
     userId: v.id("users"),
     sufferScore: v.optional(v.number()),
     kudosCount: v.optional(v.number()),
+    startDate: v.optional(v.number()),
   }).index("userId", ["userId"]),
 });
  
