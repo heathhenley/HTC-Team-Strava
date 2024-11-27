@@ -249,6 +249,7 @@ export const saveActivities = internalMutation({
     // create a new activity if it doesn't already exist
     for (const activity of activities) {
       if (!activity.type || !activity.distance || !activity.moving_time) {
+        console.log("skipping (missing time, type or distance):", activity?.type, activity?.sport_type, userId);
         continue;
       }
       if (!["Hike", "Walk", "Run", "Trail Run"].includes(activity.type)) {
