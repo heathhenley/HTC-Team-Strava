@@ -89,7 +89,7 @@ async function getActivities({
     : HTC_START / 1000; */
   console.log("statsGatheredAt", statsGatheredAt);
   const after = HTC_START / 1000;
-  const url = `${ACTIVITIES_URL}?after=${after.toFixed(0)}`;
+  const url = `${ACTIVITIES_URL}?after=${after.toFixed(0)}&per_page=200`;
   const response = await fetch(url, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
