@@ -179,6 +179,8 @@ export const saveUserStats = action({
       throw new Error("User not found");
     }
 
+    let validAccessToken = accessToken;
+
     // if the access token has expired, refresh it
     if (expiresAt * 1000 < Date.now()) {
       // refresh the access token using the refresh token
@@ -205,16 +207,23 @@ export const saveUserStats = action({
         throw new Error("Failed to refresh token");
       }
       // update the users access token
-      await ctx.runMutation(internal.strava.users.saveNewToken, {
+      ctx.runMutation(internal.strava.users.saveNewToken, {
         userId,
         accessToken: data.access_token as string,
         expiresAt: data.expires_at as number,
         refreshToken: data.refresh_token as string,
       });
+
+      // set the new access token
+      validAccessToken = data.access_token;
     }
+
  
     // Get the users activities from the strava api
-    const activities = await getActivities({ accessToken, statsGatheredAt });
+    const activities = await getActivities({
+      accessToken: validAccessToken,
+      statsGatheredAt
+    });
 
     // use an internal mutation to save new activities
     await ctx.runMutation(internal.strava.stats.saveActivities, {
