@@ -87,6 +87,7 @@ async function getActivities({
   /*const after = statsGatheredAt
     ? new Date(statsGatheredAt).getTime() / 1000
     : HTC_START / 1000; */
+  console.log("statsGatheredAt", statsGatheredAt);
   const after = HTC_START / 1000;
   const url = `${ACTIVITIES_URL}?after=${after.toFixed(0)}`;
   const response = await fetch(url, {
