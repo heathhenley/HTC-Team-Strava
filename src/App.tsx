@@ -71,7 +71,7 @@ export function TeamStatsBarChart({ data }: { data?: TeamStatsPerMonth[] }) {
 }
 
 function Header() {
-  const { signIn, signOut } = useAuthActions();
+  const { signOut } = useAuthActions();
 
   return (
     <header className="flex justify-between w-full border-b-2 p-4 bg-white">
