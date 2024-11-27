@@ -93,15 +93,6 @@ function Header() {
           Sign Out
         </Button>
       </Authenticated>
-      <Unauthenticated>
-        <button
-          onClick={() => {
-            signIn("strava");
-          }}
-        >
-          <StravaConnect />
-        </button>
-      </Unauthenticated>
     </header>
   );
 }
@@ -114,9 +105,9 @@ function App() {
   allStats?.sort((a, b) => b.totalDistance - a.totalDistance);
 
   return (
-    <div className="flex flex-col py-2 w-full h-full">
+    <div className="flex flex-col w-full h-full items-center bg-slate-100">
       <Header />
-      <section className="w-full h-full flex flex-col flex-grow md:py-8 px-4 bg-slate-50 py-4">
+      <section className="w-full xl:w-3/4 h-full flex flex-col flex-grow md:py-8 px-4 py-4">
         <Authenticated>
           <div className="flex flex-col gap-2">
             <div className="flex flex-col w-full gap-2">
@@ -212,7 +203,7 @@ function App() {
           </div>
         </Unauthenticated>
       </section>
-      <footer className="w-full flex px-6 pt-4 justify-between items-center text-center bg-white border-t-2 ">
+      <footer className="w-full flex px-6 py-2 justify-between items-center text-center bg-white border-t-2 ">
         <div>
           <p className="text-xs md:text-base">TarpsOff Industries 2024</p>
           <p className="text-xs md:text-sm text-gray-500">Est. 2022 🏃‍♂️</p>
