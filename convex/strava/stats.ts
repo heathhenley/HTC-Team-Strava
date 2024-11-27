@@ -87,7 +87,6 @@ async function getActivities({
   /*const after = statsGatheredAt
     ? new Date(statsGatheredAt).getTime() / 1000
     : HTC_START / 1000; */
-  console.log(statsGatheredAt);
   const after = HTC_START / 1000;
   const url = `${ACTIVITIES_URL}?after=${after.toFixed(0)}`;
   const response = await fetch(url, {
@@ -97,7 +96,8 @@ async function getActivities({
     },
   });
   if (!response.ok) {
-    throw new Error("Failed to get activities");
+    console.log(await response.text());
+    throw new Error("Failed to get activities: " + response.status + " " + response.statusText);
   }
   return response.json();
 }
@@ -179,7 +179,7 @@ export const saveUserStats = action({
     }
 
     // if the access token has expired, refresh it
-    if (expiresAt < Date.now()) {
+    if (expiresAt * 1000 < Date.now()) {
       // refresh the access token using the refresh token
       const response = await fetch(
         "https://www.strava.com/api/v3/oauth/token",
@@ -211,11 +211,11 @@ export const saveUserStats = action({
         refreshToken: data.refresh_token as string,
       });
     }
-
+ 
     // Get the users activities from the strava api
     const activities = await getActivities({ accessToken, statsGatheredAt });
 
-    // use and internal mutation to save new activities
+    // use an internal mutation to save new activities
     await ctx.runMutation(internal.strava.stats.saveActivities, {
       userId,
       activities,
@@ -239,12 +239,11 @@ export const saveActivities = internalMutation({
     // create a new activity if it doesn't already exist
     for (const activity of activities) {
       if (!activity.type || !activity.distance || !activity.moving_time) {
-        console.log("Skipping activity", activity);
+        console.log("user id", userId);
+        console.log("Skipping for missing type, distance, or time", activity);
         continue;
       }
       if (!["Hike", "Walk", "Run"].includes(activity.type)) {
-        console.log("Skipping activity", activity.type);
-        console.log(activity?.sport_type);
         continue;
       }
       if (usersActivityIds.includes(activity.id)) {
