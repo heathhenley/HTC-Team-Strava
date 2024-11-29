@@ -28,6 +28,14 @@ import { TeamStatsPerMonth } from "shared/types";
 
 const TEAM_GOAL = 3000; // miles
 
+function prettyNumber(num: number, decimals: number): string {
+  // print big numbers with k suffix
+  if (num > 999) {
+    return (num / 1000).toFixed(decimals) + "k";
+  }
+  return num.toFixed(decimals);
+}
+
 const chartConfig = {
   totalDistance: {
     label: "Miles",
@@ -178,7 +186,7 @@ function App() {
                           </a>
                         </TableCell>
                         <TableCell>{stat.totalDistance.toFixed(2)}</TableCell>
-                        <TableCell>{stat.totalElevation.toFixed(0)}</TableCell>
+                        <TableCell>{prettyNumber(stat.totalElevation, 1)}</TableCell>
                         <TableCell>{stat.totalMovingTime.toFixed(1)}</TableCell>
                       </TableRow>
                     ))}
