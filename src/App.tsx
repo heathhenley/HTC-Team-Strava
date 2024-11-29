@@ -20,6 +20,12 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import TeamProgress from "./components/team-progress";
 import StravaConnect from "./components/strava-connect";
 import PoweredBy from "./components/powered-by";
@@ -173,20 +179,42 @@ function App() {
                                 {stat.user.username}
                               </div>
                               <div className="flex gap-2">
-                                <div className="text-gray-500 text-xs flex items-center gap-1">
-                                  <ActivityIcon className="w-3" />
-                                  {stat.totalActivities}
-                                </div>
-                                <div className="text-gray-500 text-xs flex items-center gap-1">
-                                  <ThumbsUpIcon className="w-3" />
-                                  {stat.totalKudos}
-                                </div>
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger>
+                                      <div className="text-gray-500 text-xs flex items-center gap-1">
+                                        <ActivityIcon className="w-3" />
+                                        {stat.totalActivities}
+                                      </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <div className="text-xs">
+                                        Total Activities
+                                      </div>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger>
+                                      <div className="text-gray-500 text-xs flex items-center gap-1">
+                                        <ThumbsUpIcon className="w-3" />
+                                        {stat.totalKudos}
+                                      </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <div className="text-xs">Total Kudos</div>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
                               </div>
                             </div>
                           </a>
                         </TableCell>
                         <TableCell>{stat.totalDistance.toFixed(2)}</TableCell>
-                        <TableCell>{prettyNumber(stat.totalElevation, 1)}</TableCell>
+                        <TableCell>
+                          {prettyNumber(stat.totalElevation, 1)}
+                        </TableCell>
                         <TableCell>{stat.totalMovingTime.toFixed(1)}</TableCell>
                       </TableRow>
                     ))}
