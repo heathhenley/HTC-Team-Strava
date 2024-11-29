@@ -257,22 +257,41 @@ export const saveActivities = internalMutation({
         continue;
       }
       if (usersActivityIds.includes(activity.id)) {
-        continue;
+        // patch the activity - we were skipping but if the activity has
+        // changed we should update it, not skip it - it's pssible that the
+        // stats changed, there are more kudos etc
+        const userActivity = usersActivities.find((a) => a.id === activity.id);
+        if (!userActivity) {
+          continue;
+        }
+        await ctx.db.patch(
+          userActivity._id,
+          {
+            distance: activity.distance,
+            movingTime: activity.moving_time,
+            elevation: activity.total_elevation_gain,
+            type: activity.type,
+            sportType: activity.sport_type ?? activity.type ?? "",
+            sufferScore: activity.suffer_score,
+            kudosCount: activity.kudos_count,
+            startDate: new Date(activity.start_date).getTime(),
+          }
+        );
+      } else {
+        // new activity
+        await ctx.db.insert("activities", {
+          id: activity.id,
+          distance: activity.distance,
+          movingTime: activity.moving_time,
+          elevation: activity.total_elevation_gain,
+          type: activity.type,
+          sportType: activity.sport_type ?? activity.type ?? "",
+          userId,
+          sufferScore: activity.suffer_score,
+          kudosCount: activity.kudos_count,
+          startDate: new Date(activity.start_date).getTime(),
+        });
       }
-
-      // new activity
-      await ctx.db.insert("activities", {
-        id: activity.id,
-        distance: activity.distance,
-        movingTime: activity.moving_time,
-        elevation: activity.total_elevation_gain,
-        type: activity.type,
-        sportType: activity.sport_type ?? activity.type ?? "",
-        userId,
-        sufferScore: activity.suffer_score,
-        kudosCount: activity.kudos_count,
-        startDate: new Date(activity.start_date).getTime(),
-      });
     }
     // update the users stats
     await ctx.runMutation(internal.strava.stats.updateStats, {
