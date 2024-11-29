@@ -120,6 +120,7 @@ function App() {
                 }
                 goalMiles={TEAM_GOAL}
                 title="Total Team Miles"
+                subTitle={`Chasing ${TEAM_GOAL} miles - started on 10/15/24`}
               />
               <div className="shadow-md rounded-lg p-2 bg-white">
                 <TeamStatsBarChart data={teamStats} />
