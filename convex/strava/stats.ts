@@ -29,7 +29,7 @@ export const getTeamStatsPerMonth = query({
 
     let currDate = new Date(startDate);
     while (
-      (currDate.getMonth() < (currentDate.getMonth() + 1) &&
+      (currDate.getMonth() <= currentDate.getMonth() &&
        currDate.getFullYear() === currentDate.getFullYear()) ||
       currDate.getFullYear() < currentDate.getFullYear()
     ) {
