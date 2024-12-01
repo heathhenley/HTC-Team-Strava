@@ -29,8 +29,9 @@ export const getTeamStatsPerMonth = query({
 
     let currDate = new Date(startDate);
     while (
-      currDate.getMonth() <= currentDate.getMonth() ||
-      currDate.getFullYear() !== currentDate.getFullYear()
+      (currDate.getMonth() < (currentDate.getMonth() + 1) &&
+       currDate.getFullYear() === currentDate.getFullYear()) ||
+      currDate.getFullYear() < currentDate.getFullYear()
     ) {
       // aggregate the activies for the current month
       const monthActivities = activites.filter((activity) => {
@@ -67,7 +68,6 @@ export const getTeamStatsPerMonth = query({
         totalMovingTime: monthStats.totalMovingTime * secondsToHours,
         totalActivities: monthStats.totalActivities,
       });
-
       currDate.setMonth(currDate.getMonth() + 1);
     }
     return teamStats;
@@ -333,7 +333,7 @@ export const updateStats = internalMutation({
       .filter((q) => q.eq(q.field("userId"), userId))
       .first();
 
-    // add to the running stats total if exists, otherwise create a new one
+    // update stats total if exists, otherwise create a new one
     if (stats) {
       return await ctx.db.patch(stats._id, {
         totalDistance: totalDistance,
